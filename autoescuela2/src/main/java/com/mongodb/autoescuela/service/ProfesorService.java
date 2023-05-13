@@ -13,7 +13,7 @@ import com.mongodb.autoescuela.repository.ProfesorRepository;
 public class ProfesorService {
 	
 	@Autowired
-	private ProfesorRepository repo;	
+	private ProfesorRepository repo;
 	
 	public Profesor guardarProfesor(Profesor profesor) {
 		return repo.save(profesor);
@@ -30,7 +30,13 @@ public class ProfesorService {
 	public void eliminarProfesor(String id) {
 		repo.deleteById(id);
 	}
-	
 
+	public List<Alumno> listarAlumnosPorProfesor(String idProfesor){
 
+		Profesor profe= repo.findById(idProfesor).orElse(null);
+		
+		List<Alumno> listado=profe.getListadoAlumnos();
+		
+		return listado;
+	}
 }

@@ -14,13 +14,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.mongodb.autoescuela.model.Alumno;
 import com.mongodb.autoescuela.model.Profesor;
 import com.mongodb.autoescuela.service.ProfesorService;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/roan/profesores")
+@CrossOrigin
 public class ProfesorController {
 	
 	@Autowired
@@ -51,18 +53,39 @@ public class ProfesorController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Profesor> actualizar(@RequestBody Profesor profesor,@PathVariable String id) {
-		Profesor profesorBd = service.listarProfesorId(id);
-		if(profesorBd !=null)
-		{
-			Profesor actualizado=service.guardarProfesor(profesor);
-			return new ResponseEntity<Profesor>(actualizado,HttpStatus.CREATED);
-		}		
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	public ResponseEntity<Profesor> actualizar(@RequestBody Profesor profesor){
+		Profesor profeBbdd= service.listarProfesorId(profesor.getId());
+		
+		if(profeBbdd == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El profesor no existe");
+		}
+		Profesor actualizado= service.guardarProfesor(profesor);
+		
+		return new ResponseEntity<Profesor>(actualizado,HttpStatus.CREATED);
+	}
+
+	@GetMapping("/alumnos/{id}")
+	public ResponseEntity<List<Alumno>> listadoAlumnosPorProfesor(@PathVariable String id){
+		
+		List<Alumno> listado= service.listarAlumnosPorProfesor(id);
+		System.err.println(listado.size());
+		return new ResponseEntity<List<Alumno>>(listado,HttpStatus.OK);
 	}
 	
-	// Métodos para tratar la lista de alumnos
-	
-	
+	@PutMapping("/alumnos/{id}")
+	public ResponseEntity<Profesor> actualizarListado(@RequestBody Alumno alumno, @PathVariable String id){
+		
+		Profesor profeBbdd= service.listarProfesorId(id);
 
+		if(profeBbdd == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El profesor no existe");
+		}
+		//Obtener la lista de alumnos
+		List<Alumno> listado= profeBbdd.getListadoAlumnos();
+		listado.add(alumno);
+		profeBbdd.setListadoAlumnos(listado);
+		Profesor actualizado= service.guardarProfesor(profeBbdd);
+		return new ResponseEntity<Profesor>(actualizado,HttpStatus.CREATED);
+		
+	}
 }

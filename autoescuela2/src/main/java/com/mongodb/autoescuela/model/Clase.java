@@ -1,5 +1,6 @@
 package com.mongodb.autoescuela.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -7,15 +8,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 
-@Document(value="profesores")
+@Document(value="clases")
 @Data
-public class Profesor {
+public class Clase {
 	
 	@Id
 	private String id;
-	private String nombre;
-	private String apellido;
-	private String telefono;
-	private String email;
-    private List<Alumno> listaAlumnos;
+	private LocalDate fecha;
+	private String hora;
+	private Alumno alumno;
+
 }
